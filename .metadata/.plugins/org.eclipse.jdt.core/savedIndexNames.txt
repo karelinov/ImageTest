@@ -1,0 +1,14 @@
+INDEX VERSION 1.134+C:\Users\o.karelin\Documents\Projects\ImageTest\.metadata\.plugins\org.eclipse.jdt.core
+3348443267.index
+1865797976.index
+1558834582.index
+2514555269.index
+1473357566.index
+3919052712.index
+709989365.index
+804635376.index
+3747155557.index
+3901736650.index
+3992943997.index
+1319105479.index
+1099025831.index

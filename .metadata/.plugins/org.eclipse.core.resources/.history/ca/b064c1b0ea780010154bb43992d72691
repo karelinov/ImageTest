@@ -1,0 +1,12 @@
+package Application;
+
+import javafx.scene.Node;
+import javafx.scene.canvas.*;
+
+public class ImageCreator {
+	public Object CreateImage() {
+		Node 
+		
+	}
+
+}

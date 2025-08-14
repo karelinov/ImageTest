@@ -1,0 +1,50 @@
+package Application;
+
+import javafx.scene.Node;
+import javafx.scene.canvas.*;
+import javafx.scene.image.Image;
+
+import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+
+public class ImageCreator {
+	public Object CreateImage() {
+		
+		//Canvas canvas = new Canvas(416,88);
+		//final GraphicsContext gc = canvas.getGraphicsContext2D();
+		//gc.
+		
+		return null;
+	}
+	
+	
+	private Image GetActionDBImage(String deviceType, String imageCode) {
+     Image result;
+	 Connection c = null;
+     PreparedStatement stmt = null;
+     
+     try {
+	     Class.forName("org.postgresql.Driver");
+	     c = DriverManager.getConnection("jdbc:postgresql://172.16.10.21:5432/actions","postgres", "Bhz8/jYkjW8=");
+	     System.out.println("Opened database successfully");
+	
+	     String sql = "select * from actions_scema.signs where device_type=? and sign_code=?";
+	     stmt = c.prepareStatement(sql);
+	     stmt.setString(1, deviceType);
+	     stmt.setString(2, imageCode);
+	     ResultSet resultSet =  stmt.executeQuery();
+	     stmt.close();
+	     c.close();
+	     result = new Image(resultSet.getBinaryStream("sign_file"));
+     }
+     catch(Exception e) {
+    	 System.err.println( e.getClass().getName()+": "+ e.getMessage());
+     }
+	     
+     return result;
+	}
+
+}
