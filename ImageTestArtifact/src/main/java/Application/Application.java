@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.util.Properties;
+import java.io.FileInputStream;
 
 import javax.imageio.ImageIO;
 
@@ -14,49 +16,63 @@ import com.sun.net.httpserver.HttpServer;
 
 class Application {
 
-   public static void main(String[] args) throws IOException {
-       int serverPort = 8000;
-       HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
-       /*
-       server.createContext("/api/hello", (exchange -> {
-           String respText = "Hello!";
-           exchange.sendResponseHeaders(200, respText.getBytes().length);
-           OutputStream output = exchange.getResponseBody();
-           output.write(respText.getBytes());
-           output.flush();
-           exchange.close();
-       }));
-       */
-       server.createContext("/api/hello", (exchange -> hello(exchange)));
-       server.createContext("/api/createimage", (exchange -> CreateImage(exchange)));
-       server.setExecutor(null); // creates a default executor
-       server.start();
-   }
-   
-   private static void hello(HttpExchange exchange) throws IOException {
-	   String respText="Hello!";	   
-       exchange.sendResponseHeaders(200, respText.getBytes().length);
-       OutputStream output = exchange.getResponseBody();
-       output.write(respText.getBytes());
-       output.flush();
-       exchange.close();
-   }
-   
-   private static void CreateImage(HttpExchange exchange) throws IOException {
-	   BufferedImage bufferedImage = ImageCreator.CreateImage();
-	   ByteArrayOutputStream os = new ByteArrayOutputStream();
-	   ImageIO.write(bufferedImage, "jpg", os);
-	   
-	   Headers responseHeaders = exchange.getResponseHeaders();
-	   responseHeaders.set("Content-Type", "image/jpeg");
-	   
-       exchange.sendResponseHeaders(200, os.toByteArray().length);
-       
-       OutputStream output = exchange.getResponseBody();
-       output.write(os.toByteArray());
-       output.flush();
-       exchange.close();
-   }
-   
-   
+	public static void main(String[] args) throws IOException {
+		int serverPort = 8000;
+		HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
+		/*
+		 * server.createContext("/api/hello", (exchange -> { String respText = "Hello!";
+		 * exchange.sendResponseHeaders(200, respText.getBytes().length); OutputStream
+		 * output = exchange.getResponseBody(); output.write(respText.getBytes());
+		 * output.flush(); exchange.close(); }));
+		 */
+		server.createContext("/api/hello", (exchange -> hello(exchange)));
+		server.createContext("/api/createimage", (exchange -> CreateImage(exchange)));
+		server.setExecutor(null); // creates a default executor
+		server.start();
+	}
+
+	private static void hello(HttpExchange exchange) throws IOException {
+		String respText = "Hello!";
+		exchange.sendResponseHeaders(200, respText.getBytes().length);
+		OutputStream output = exchange.getResponseBody();
+		output.write(respText.getBytes());
+		output.flush();
+		exchange.close();
+	}
+
+	private static void CreateImage(HttpExchange exchange) throws IOException {
+		BufferedImage bufferedImage = ImageCreator.CreateImage();
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "jpg", os);
+
+		Headers responseHeaders = exchange.getResponseHeaders();
+		responseHeaders.set("Content-Type", "image/jpeg");
+
+		exchange.sendResponseHeaders(200, os.toByteArray().length);
+
+		OutputStream output = exchange.getResponseBody();
+		output.write(os.toByteArray());
+		output.flush();
+		exchange.close();
+	}
+
+	private static Properties _properties = null;
+
+	public static Properties GetProperties() {
+		String appPath = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "app.properties";
+
+		try {
+			if (_properties == null) {
+				_properties = new Properties();
+				_properties.load(new FileInputStream(appPath));
+
+			}
+		} catch (Exception e) {
+			_properties = null;
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+		}
+
+		return _properties;
+	}
+
 }

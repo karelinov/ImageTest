@@ -47,10 +47,13 @@ public class ImageCreator {
 	 java.awt.Image result = null;
 	 Connection c = null;
      PreparedStatement stmt = null;
+     String actions_pwd;
      
      try {
 	     //Class.forName("org.postgresql.Driver");
-	     c = DriverManager.getConnection("jdbc:postgresql://172.16.10.21:5432/actions","postgres", "Bhz8/jYkjW8=");
+    	 actions_pwd = Application.GetProperties().getProperty("actions_pwd");
+    	 
+	     c = DriverManager.getConnection("jdbc:postgresql://172.16.10.21:5432/actions","postgres", actions_pwd);
 	     System.out.println("Opened database successfully");
 	
 	     String sql = "select * from actions_schema.signs where device_type=? and sign_code=?";
