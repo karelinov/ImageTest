@@ -10,15 +10,22 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.OutputStreamWriter;
+
 
 import javax.imageio.ImageIO;
 
 import org.apache.batik.dom.AbstractDOMImplementation;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+
+import Application.DBImageReader.DBImageData;
 
 public class ImageCreator {
 	public static BufferedImage CreatePNGImage() {
@@ -50,12 +57,30 @@ public class ImageCreator {
 			g2d.setPaint(Color.gray);
 			g2d.fillRect(0, 0, 416, 88);
 			
+			// PNG
+			DBImageReader.DBImageData dbImageData1 = DBImageReader.ReadImageData("VMS", "12");  
+			BufferedImage bimage = ImageIO.read(new ByteArrayInputStream(dbImageData1.Data));
+			g2d.drawImage(bimage, 0, 0, null);
+			
+			// SVG
+			DBImageReader.DBImageData dbImageData2 = DBImageReader.ReadImageData("VMS", "11");
+			
+	        PNGTranscoder t = new PNGTranscoder();
+	        TranscoderInput input = new TranscoderInput(new ByteArrayInputStream(dbImageData2.Data));
+	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	        TranscoderOutput output = new TranscoderOutput(baos);
+	        t.transcode(input, output);
+	        
+			BufferedImage bimage2 = ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));
+			g2d.drawImage(bimage2, 100, 0, 64,64, null);
+			
+			
 			// Выплёвываем в bytearray
 		    boolean useCSS = true; // we want to use CSS style attributes
-		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		    Writer out = new OutputStreamWriter(baos, "UTF-8"); 
+		    ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+		    Writer out = new OutputStreamWriter(baos1, "UTF-8"); 
 		    g2d.stream(out, useCSS);
-		    result = baos.toByteArray();
+		    result = baos1.toByteArray();
 		    		
 
 		} catch (Exception e) {
