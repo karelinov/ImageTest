@@ -26,7 +26,8 @@ class Application {
 		 * output.flush(); exchange.close(); }));
 		 */
 		server.createContext("/api/hello", (exchange -> hello(exchange)));
-		server.createContext("/api/createimage", (exchange -> CreateImage(exchange)));
+		server.createContext("/api/creatrastereimage", (exchange -> CreateRasterImage(exchange)));
+		server.createContext("/api/createsvgimage", (exchange -> CreateSVGImage(exchange)));
 		server.setExecutor(null); // creates a default executor
 		server.start();
 	}
@@ -40,10 +41,10 @@ class Application {
 		exchange.close();
 	}
 
-	private static void CreateImage(HttpExchange exchange) throws IOException {
-		BufferedImage bufferedImage = ImageCreator.CreateImage();
+	private static void CreateRasterImage(HttpExchange exchange) throws IOException {
+		BufferedImage bufferedImage = ImageCreator.CreatePNGImage();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ImageIO.write(bufferedImage, "jpg", os);
+		ImageIO.write(bufferedImage, "PNG", os);
 
 		Headers responseHeaders = exchange.getResponseHeaders();
 		responseHeaders.set("Content-Type", "image/jpeg");
@@ -55,6 +56,20 @@ class Application {
 		output.flush();
 		exchange.close();
 	}
+	
+	private static void CreateSVGImage(HttpExchange exchange) throws IOException {
+		byte[] svgImageBytes = ImageCreator.CreateSVGImage();
+
+		Headers responseHeaders = exchange.getResponseHeaders();
+		responseHeaders.set("Content-Type", "image/svg+xml");
+
+		exchange.sendResponseHeaders(200, svgImageBytes.length);
+
+		OutputStream output = exchange.getResponseBody();
+		output.write(svgImageBytes);
+		output.flush();
+		exchange.close();
+	}	
 
 	private static Properties _properties = null;
 

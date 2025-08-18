@@ -1,76 +1,69 @@
 package Application;
 
-/*
-import javafx.scene.Node;
-import javafx.scene.canvas.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
-*/
+import java.io.Writer;
 
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+
 import javax.imageio.ImageIO;
 
+import org.apache.batik.dom.AbstractDOMImplementation;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+
 public class ImageCreator {
-	public static BufferedImage CreateImage() {
+	public static BufferedImage CreatePNGImage() {
 		BufferedImage bufferedImage = null;
-
-		Platform.runLater(() -> {
-
-			Canvas canvas = new Canvas(416, 88);
-			final GraphicsContext gc = canvas.getGraphicsContext2D();
-			gc.drawImage(GetActionDBImage("VMS", "12"), 0, 0);
-
-			WritableImage writableImage = canvas.snapshot(null, null);
-			bufferedImage = SwingFXUtils.fromFXImage(writableImage, null);
-			// ImageIO.write(bufferedImage, format, outputFile)
-
-		});
+		/*
+		 * Canvas canvas = new Canvas(416, 88); final GraphicsContext gc =
+		 * canvas.getGraphicsContext2D(); gc.drawImage(GetActionDBImage("VMS", "12"), 0,
+		 * 0);
+		 * 
+		 * WritableImage writableImage = canvas.snapshot(null, null); bufferedImage =
+		 * SwingFXUtils.fromFXImage(writableImage, null); //
+		 * ImageIO.write(bufferedImage, format, outputFile)
+		 */
 		return bufferedImage;
 	}
 
-	/***
-	 * Получение java.awt.Image из БД Actions
-	 * вероятно только растровый
-	 * @param deviceType
-	 * @param imageCode
-	 * @return
-	 */
-	private static java.awt.Image GetActionDBImage(String deviceType, String imageCode) {
-	 java.awt.Image result = null;
-	 Connection c = null;
-     PreparedStatement stmt = null;
-     String actions_pwd;
-     
-     try {
-	     //Class.forName("org.postgresql.Driver");
-    	 actions_pwd = Application.GetProperties().getProperty("actions_pwd");
-    	 
-	     c = DriverManager.getConnection("jdbc:postgresql://172.16.10.21:5432/actions","postgres", actions_pwd);
-	     System.out.println("Opened database successfully");
-	
-	     String sql = "select * from actions_schema.signs where device_type=? and sign_code=?";
-	     stmt = c.prepareStatement(sql);
-	     stmt.setString(1, deviceType);
-	     stmt.setString(2, imageCode);
-	     ResultSet resultSet =  stmt.executeQuery();
-	     resultSet.next();
-	     result = ImageIO.read(resultSet.getBinaryStream("sign_file")); 
-	     stmt.close();
-	     c.close();
-     }
-     catch(Exception e) {
-    	 System.err.println( e.getClass().getName()+": "+ e.getMessage());
-     }
-	     
-     return result;
+	public static byte[] CreateSVGImage() {
+		byte[] result = null;
+
+		try {
+
+			// основной svg документ и SVGGraphics2D для рисования
+			DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+			String svgNS = "http://www.w3.org/2000/svg";
+			Document document = domImpl.createDocument(svgNS, "svg", null);
+			SVGGraphics2D g2d = new SVGGraphics2D(document);
+
+			// Фон
+			g2d.setPaint(Color.gray);
+			g2d.fillRect(0, 0, 416, 88);
+			
+			// Выплёвываем в bytearray
+		    boolean useCSS = true; // we want to use CSS style attributes
+		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    Writer out = new OutputStreamWriter(baos, "UTF-8"); 
+		    g2d.stream(out, useCSS);
+		    result = baos.toByteArray();
+		    		
+
+		} catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			result = null;
+		}
+
+		return result;
 	}
 
 }
