@@ -26,7 +26,7 @@ class Application {
 		 * output.flush(); exchange.close(); }));
 		 */
 		server.createContext("/api/hello", (exchange -> hello(exchange)));
-		server.createContext("/api/creatrastereimage", (exchange -> CreateRasterImage(exchange)));
+		server.createContext("/api/createpngimage", (exchange -> CreatePNGImage(exchange)));
 		server.createContext("/api/createsvgimage", (exchange -> CreateSVGImage(exchange)));
 		server.setExecutor(null); // creates a default executor
 		server.start();
@@ -41,18 +41,16 @@ class Application {
 		exchange.close();
 	}
 
-	private static void CreateRasterImage(HttpExchange exchange) throws IOException {
-		BufferedImage bufferedImage = ImageCreator.CreatePNGImage();
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ImageIO.write(bufferedImage, "PNG", os);
+	private static void CreatePNGImage(HttpExchange exchange) throws IOException {
+		byte[] imageBytes = ImageCreator.CreatePNGImage();
 
 		Headers responseHeaders = exchange.getResponseHeaders();
-		responseHeaders.set("Content-Type", "image/jpeg");
+		responseHeaders.set("Content-Type", "image/png");
 
-		exchange.sendResponseHeaders(200, os.toByteArray().length);
+		exchange.sendResponseHeaders(200, imageBytes.length);
 
 		OutputStream output = exchange.getResponseBody();
-		output.write(os.toByteArray());
+		output.write(imageBytes);
 		output.flush();
 		exchange.close();
 	}
