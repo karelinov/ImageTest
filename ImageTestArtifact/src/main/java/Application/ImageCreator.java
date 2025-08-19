@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -57,15 +58,24 @@ public class ImageCreator {
 			g2d.setPaint(Color.gray);
 			g2d.fillRect(0, 0, 416, 88);
 			
+			// Текст
+			g2d.setPaint(Color.yellow);
+			g2d.setFont(new Font("SansSerif", Font.PLAIN,24));
+			g2d.drawString("ПРИВЕТ", 220, 30);  
+			
 			// PNG
 			DBImageReader.DBImageData dbImageData1 = DBImageReader.ReadImageData("VMS", "12");  
 			BufferedImage bimage = ImageIO.read(new ByteArrayInputStream(dbImageData1.Data));
 			g2d.drawImage(bimage, 0, 0, null);
 			
+			// ещё текст
+			g2d.setFont(new Font("SansSerif", Font.PLAIN,12));
+			g2d.drawString("PNG VMS 12", 0, 76);  
+			
+			
 			// SVG
 			DBImageReader.DBImageData dbImageData2 = DBImageReader.ReadImageData("VMS", "11");
-			
-	        PNGTranscoder t = new PNGTranscoder();
+	        PNGTranscoder t = new PNGTranscoder(); 			// тут нехорошее преобразование в растр, но не сильно повлияло на качество
 	        TranscoderInput input = new TranscoderInput(new ByteArrayInputStream(dbImageData2.Data));
 	        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	        TranscoderOutput output = new TranscoderOutput(baos);
@@ -73,6 +83,9 @@ public class ImageCreator {
 	        
 			BufferedImage bimage2 = ImageIO.read(new ByteArrayInputStream(baos.toByteArray()));
 			g2d.drawImage(bimage2, 100, 0, 64,64, null);
+			
+			// ещё текст
+			g2d.drawString("SVG VMS 11", 100, 76);  
 			
 			
 			// Выплёвываем в bytearray
