@@ -1,7 +1,8 @@
-/.metadata/*
-/.ImageTestArtifact/target/classes/*
-/.ImageTestArtifact/*.classpath
+.metadata/**
+.ImageTestArtifact/target/classes/**
+/ImageTestArtifact/target/classes/**
+.ImageTestArtifact/*.classpath
 *.classpath
 *.class
-/ImageTestArtifact/target/maven-status/maven-compiler-plugin/compile/default-compile/*.lst
-/.metadata/
+ImageTestArtifact/target/maven-status/maven-compiler-plugin/compile/default-compile/*.lst
+.metadata/
